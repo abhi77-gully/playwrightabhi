@@ -1,12 +1,19 @@
-            const { test, expect } = require('@playwright/test');
-            test('Login form validation', async ({ page }) => {
-                await page.goto('http://127.0.0.1:5500/html/login.html');
-                await page.fill('#username', 'admin');
-                await page.fill('#password', '1234');
-                //await page.click('text=Login');
-                await page.evaluate(() => {
-                    login(); // directly call the login function from within the page
-                });
-                // await page.waitForTimeout(5000);
-                await expect(page.locator('#message')).toHaveText('Login successful');
-            });
+const { test, expect } = require('@playwright/test');
+const path = require('path');
+
+test('custom login form - success scenario', async ({ page }) => {
+
+  const filePath = path.resolve(__dirname, '../html/login.html');
+  const fileUrl = 'file://' + filePath;
+
+  await page.goto(fileUrl);
+
+  await page.fill('#username', 'admin');
+  await page.fill('#password', '1234');  // matches HTML
+  await page.click('button');
+
+  const message = page.locator('#message');
+
+  await expect(message).toBeVisible();
+  await expect(message).toHaveText('Login successful'); // matches HTML
+});
